@@ -1,28 +1,29 @@
 package org.networkcalculus.dnc.SPPAnalyzer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.networkcalculus.dnc.backend.Curve;
 import org.networkcalculus.dnc.backend.CurveFactory;
 import org.networkcalculus.dnc.backend.number.Number;
 import org.networkcalculus.dnc.network.device_graph.Device;
 import org.networkcalculus.dnc.network.device_graph.DeviceGraph;
 
-import java.io.File;
 import java.util.*;
 
 // FILE METHODS LARGELY GENERATED USING CLAUDE Sonnet 5.5
 
 public class SppDeviceGraph extends DeviceGraph {
 
+    static double ASSUMED_SWITCH_RATE = 10e6; // Bytes/s
+
     static Curve buildServiceCurve() {
         System.out.println("Building Service Curve for device");
-        return CurveFactory.createTokenBucket(new Number(10e6), new Number(0.1 * 0.1e6));
+        // Service curve for FIFO is modelled by Rate = Link rate, Latency = 0
+        return CurveFactory.createRateLatency(ASSUMED_SWITCH_RATE, 0);
     }
 
     static Curve buildArrivalCurve(FlowSpec flowInstance) {
         System.out.printf("Building Arrival Curve for flow instance of %s with IAT(%s) and Size (%s)\n", flowInstance.type, flowInstance.iat, flowInstance.size);
-        return CurveFactory.createTokenBucket(new Number(0.1e6), new Number(0.1 * 0.1e6));
+
+        return CurveFactory.createTokenBucket(1000000.0 / flowInstance.iat.mean, flowInstance.size.p99);
     }
 
 

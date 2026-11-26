@@ -24,6 +24,8 @@ public class SppAnalyzerApp {
         File[] files = Dialogs.chooseSpplogFiles();
         if (files.length == 0) return;
 
+        System.out.println(files);
+
         int ok = 0;
         for (File f : files) {
             if (process(f, minSamples)) ok++;
@@ -52,10 +54,8 @@ public class SppAnalyzerApp {
             System.out.println("Analyzing " + spplog.getName() + " (" + flows.size() + " flows)");
             DeviceGraph dg = SppDeviceGraph.fromFlowSpecs(flows);
             ServerGraph sg = dg.convertToServerGraph(new SpanningTreeProtocol(), new ShortestPath());
-
             Map<String, FlowSpec> byAlias = new LinkedHashMap<>();
             for (FlowSpec f : flows) byAlias.put(f.alias(), f);
-
             List<BoundsAnalyzer.FlowResult> results = new BoundsAnalyzer(sg).analyzeAll(byAlias);
 
             // 4. CSV

@@ -15,7 +15,7 @@ import java.util.Map;
 final class BoundsAnalyzer {
 
     enum Method {
-        TFA_ARB(true, false), TFA_FIFO(true, true), SFA_ARB(false, false), SFA_FIFO(false, true);
+        TFA_FIFO(true, true), SFA_FIFO(false, true);
 
         final boolean tfa, fifo;
 
@@ -71,7 +71,11 @@ final class BoundsAnalyzer {
             System.out.printf("[%d/%d] %s%n", i, total, foi.getAlias());
 
             FlowResult r = new FlowResult(spec);
-            for (Method m : Method.values()) r.bounds.put(m, run(m, foi));
+            // Run experiment for each method
+            for (Method m : Method.values()) {
+                System.out.printf("Running %s%n", m.toString()); // Debug
+                r.bounds.put(m, run(m, foi));
+            }
             results.add(r);
         }
         return results;
@@ -80,12 +84,15 @@ final class BoundsAnalyzer {
     private Bounds run(Method m, Flow foi) {
         AnalysisConfig cfg = m.fifo ? cfgFifo : cfgArb;
         try {
+            System.out.println("Creating Analysis"); // Debug
             if (m.tfa) {
                 TotalFlowAnalysis a = new TotalFlowAnalysis(sg, cfg);
+                System.out.println("Performing Analysis"); // Debug
                 a.performAnalysis(foi);
                 return new Bounds(a.getDelayBound().toDouble(), a.getBacklogBound().toDouble());
             } else {
                 SeparateFlowAnalysis a = new SeparateFlowAnalysis(sg, cfg);
+                System.out.println("Performing Analysis"); // Debug
                 a.performAnalysis(foi);
                 return new Bounds(a.getDelayBound().toDouble(), a.getBacklogBound().toDouble());
             }

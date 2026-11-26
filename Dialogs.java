@@ -16,9 +16,9 @@ final class Dialogs {
     /** @return selected .spplog files, or an empty array if cancelled */
     static File[] chooseSpplogFiles() {
         JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-        chooser.setDialogTitle("Select .spplog file(s)");
+        chooser.setDialogTitle("Select .spp_conf file(s)");
         chooser.setMultiSelectionEnabled(true);
-        chooser.setFileFilter(new FileNameExtensionFilter("SPP log files (*.spplog)", "spplog"));
+        chooser.setFileFilter(new FileNameExtensionFilter("SPP log files (*.spp_conf)", "spp_conf"));
         return chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION
                 ? chooser.getSelectedFiles() : new File[0];
     }
